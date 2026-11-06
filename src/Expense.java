@@ -1,38 +1,25 @@
-class Date implements Comparable<Date> {
-    int date;
-    int month;
-    int year;
+import java.time.LocalDate;
 
-    @Override
-    public int compareTo(Date o) {
-        if (this.year != o.year)
-            return this.year > o.year ? 1 : -1;
-        if (this.month != o.month)
-            return this.month > o.month ? 1 : -1;
-        if (this.date != o.date)
-            return this.date > o.date ? 1 : -1;
-        return 0;
-    }
-
-    Date(int date, int month, int year)
-    {
-        this.date = date;
-        this.month = month;
-        this.year = year;
-    }
-
-    Date(String date)
-    {
-        // TODO: Implement this fully
-    }
-}
-
-public class Expense {
+public class Expense implements Comparable<Expense> {
     boolean spent;
-    Date date;
+    LocalDate date;
     String category;
     double amount;
     String note;
 
-    // TODO: Add some constructors here
+    @Override
+    public int compareTo(Expense o) {
+        if (this.amount == o.amount)
+            return 0;
+        else if (this.amount > o.amount)
+            return 1;
+        else return -1;
+    }
+    Expense(LocalDate date, String category, double amount, String note)
+    {
+        this.date = date;
+        this.category = category;
+        this.amount = amount;
+        this.note = note;
+    }
 }
