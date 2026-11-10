@@ -5,13 +5,17 @@ import java.util.Scanner;
 
 public class Main {
 
+    public static void clear ()
+    {
+        System.out.print("\033[H\033[2J");
+    }
     public static void main(String[] args) {
 
         while (true)
         {
             Scanner sc = new Scanner(System.in);
             Expenses ex = new Expenses();
-            System.out.print("\033[H\033[2J"); // TODO: This doesn't work and needs to be replaced. Best to use a method for this.
+            clear();
             System.out.println("Enter your choice:\n");
             System.out.println("1. Add an expense with date, category, amount and a short note");
             System.out.println("2. Set a monthly budget for each category");
@@ -22,11 +26,11 @@ public class Main {
             switch (sc.nextInt())
             {
                 case 1 -> {
-                    System.out.print("\033[H\033[2J");
+                    clear();
                     System.out.println("1. Today's Date");
                     System.out.println("2. Enter Custom Date");
                     if (sc.nextInt() == 2) {
-                        System.out.print("\033[H\033[2J");
+                        clear();
                         System.out.println("Current Categories: " + ex.categories());
                         System.out.print("Enter Category: ");
                         String category = sc.next();
@@ -44,7 +48,7 @@ public class Main {
                     }
                     else
                     {
-                        System.out.print("\033[H\033[2J");
+                        clear();
                         System.out.println("Current Categories: " + ex.categories());
                         System.out.print("Enter Category: ");
                         String category = sc.next();
@@ -58,16 +62,25 @@ public class Main {
                     }
                 }
                 case 2 -> {
-                    ex.setBudget();
+                    System.out.println("Current Categories: " + ex.categories());
+                    System.out.print("Enter the category (Keep blank to set overall budget): ");
+                    String category = sc.next();
+                    System.out.print("Enter the budget to be set");
+                    if (ex.setBudget(category.trim(), sc.nextInt()))
+                        System.out.println("Successfully set budget!");
+                    else
+                        System.out.println("Budget is still "+ex.total+". The requested budget isn't feasible with the category-specific budgets!");
                 }
                 case 3 -> {
                     ex.warn = !ex.warn;
+                    String output = ex.warn ? "Warnings enabled" : "Warnings disabled";
+                    System.out.println(output);
                 }
                 case 4 -> {
                     ex.getSummary();
                 }
                 case 5 -> {
-                    ex.getLargestExpenses(sc.nextInt());
+                    System.out.println(ex.getLargestExpenses(sc.nextInt()));
                 }
                 case 6 -> {
                     return;

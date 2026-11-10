@@ -22,4 +22,12 @@ public class Expense implements Comparable<Expense> {
         this.amount = amount;
         this.note = note;
     }
+    @Override
+    public String toString()
+    {
+        if (note.isEmpty())
+            return date+"\t"+category+"\t"+amount+"\n";
+        else
+            return date+"\t"+category+"\t"+amount+"\nNote: "+note+"\n";
+    }
 }
