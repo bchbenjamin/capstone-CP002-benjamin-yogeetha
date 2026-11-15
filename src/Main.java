@@ -1,21 +1,13 @@
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
-
-    public static void clear ()
-    {
-        System.out.print("\033[H\033[2J");
-    }
     public static void main(String[] args) {
-
+        // Loaded value must be written here
+        Expenses ex = new Expenses();
         while (true)
         {
             Scanner sc = new Scanner(System.in);
-            Expenses ex = new Expenses();
-            clear();
             System.out.println("Enter your choice:\n");
             System.out.println("1. Add an expense with date, category, amount and a short note");
             System.out.println("2. Set a monthly budget for each category");
@@ -26,16 +18,15 @@ public class Main {
             switch (sc.nextInt())
             {
                 case 1 -> {
-                    clear();
                     System.out.println("1. Today's Date");
                     System.out.println("2. Enter Custom Date");
                     if (sc.nextInt() == 2) {
-                        clear();
                         System.out.println("Current Categories: " + ex.categories());
                         System.out.print("Enter Category: ");
                         String category = sc.next();
                         System.out.print("Enter Expense: ");
                         double expense = sc.nextDouble();
+                        sc.next();
                         System.out.print("Enter short note (Press enter to skip): ");
                         String note = sc.nextLine();
                         System.out.print("Enter Year: ");
@@ -48,28 +39,45 @@ public class Main {
                     }
                     else
                     {
-                        clear();
                         System.out.println("Current Categories: " + ex.categories());
                         System.out.print("Enter Category: ");
                         String category = sc.next();
-                        sc.nextLine(); // to get other words
+                        sc.nextLine();
                         System.out.print("Enter Expense: ");
                         double expense = sc.nextDouble();
-                        sc.nextLine(); // to get the '\n'
+                        sc.nextLine();
                         System.out.print("Enter short note (Press enter to skip): ");
                         String note = sc.nextLine();
                         ex.setExpense(LocalDate.now(), category.toLowerCase(), expense, note.trim());
                     }
                 }
                 case 2 -> {
-                    System.out.println("Current Categories: " + ex.categories());
-                    System.out.print("Enter the category (Keep blank to set overall budget): ");
-                    String category = sc.next();
+                    String category;
+                    do
+                    {
+                        System.out.println("Current Categories: " + ex.categories());
+                        System.out.print("Enter the category: ");
+                        category = sc.next().trim();
+                        if (!Expenses.isValidCategory(category))
+                        {
+                            System.out.println("Invalid Category!");
+                        }
+                        else break;
+                    }
+                    while (true);
                     System.out.print("Enter the budget to be set");
-                    if (ex.setBudget(category.trim(), sc.nextInt()))
-                        System.out.println("Successfully set budget!");
-                    else
-                        System.out.println("Budget is still "+ex.total+". The requested budget isn't feasible with the category-specific budgets!");
+                    switch (ex.setBudget(category, sc.nextInt()))
+                    {
+                        case 1 -> {
+                            System.out.println("Budget set successfully!");
+                        }
+                        case 0 -> {
+                            System.out.println("Budget set successfully! You've already spent more than 80% of your monthly budget");
+                        }
+                        case -1 -> {
+                            System.out.println("You've already spent more than budget. Budget NOT set!");
+                        }
+                    }
                 }
                 case 3 -> {
                     ex.warn = !ex.warn;
@@ -77,15 +85,20 @@ public class Main {
                     System.out.println(output);
                 }
                 case 4 -> {
-                    ex.getSummary();
+                    System.out.println(ex.getThisMonthExpenses());
                 }
                 case 5 -> {
+                    System.out.print("Enter the number of top expenses to be logged: ");
                     System.out.println(ex.getLargestExpenses(sc.nextInt()));
                 }
                 case 6 -> {
+                    // Write to CSV and exit
+                    // If this is implemented then at the start, you must load from CSV
                     return;
                 }
             }
+            System.out.println("----Press any key to go next----");
+            sc.nextLine();
         }
     }
 }

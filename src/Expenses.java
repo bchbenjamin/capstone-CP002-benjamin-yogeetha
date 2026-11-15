@@ -1,7 +1,5 @@
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -9,44 +7,65 @@ public class Expenses implements Iterable<Expense> {
     private ArrayList<Expense> expenses = new ArrayList<>();
     private HashMap<String, Integer> categories = new HashMap<>();
     private HashMap<String, Double> budget = new HashMap<>();
-    public double total = 0;
+//    public double total = Double.MAX_VALUE;
     public boolean warn = true;
+
     public void getSummary() {
         System.out.println(this);
     }
 
     public Expenses getLargestExpenses(int n) {
         expenses.sort(Expense::compareTo);
-        int largest = expenses.toArray().length;
-        int smallest = Math.max(0, largest - n);
+        int largest = expenses.toArray().length-1;
+        int smallest = Math.max(-1, largest - n);
         Expenses output = new Expenses();
-        for (int i = largest-1; i >= smallest; i--)
+        for (int i = largest; i > smallest; i--)
             output.setExpenses(expenses.get(i));
         return output;
     }
 
-    public boolean setBudget(String key, double value) {
-        if (budget.isEmpty() && categories.isEmpty())
-        {
-            total = Math.max(total, value);
-            return value == total;
-        }
-        if (budget.isEmpty())
-        {
-            for (String category : categories.keySet())
-                budget.put(category, -1.0);
-        }
-        budget.put(key, value);
-        return setOverallBudget();
+    public Expenses getThisMonthExpenses()
+    {
+        Expenses output = new Expenses();
+        for (Expense e : expenses)
+            if (inTheSameMonth(e.date))
+                output.setExpenses(e);
+        return output;
     }
 
-    private boolean setOverallBudget()
-    {
-        double a = 0;
-        for (String category : budget.keySet())
-            a += budget.get(category);
-        total = Math.max(a, total);
-        return total == a;
+    public static boolean inTheSameMonth(LocalDate other)
+        {return other.getDayOfMonth() == LocalDate.now().getDayOfMonth() && other.getDayOfYear() == LocalDate.now().getDayOfYear();}
+
+    public int setBudget(String category, double budget_value) {
+        /**
+         * returns 1 if the budget is set successfully
+         * returns 0 if the budget was set but the user needs to be warned (80+% of the budget has been spent)
+         * returns -1 if the budget was not set.
+         */
+        double spentBudget = 0.0;
+        for (Expense e : expenses)
+            if (e.category.equals(category) && inTheSameMonth(e.date))
+                spentBudget += e.amount;
+        if (warn)
+        {
+            if (spentBudget > budget_value)
+                return -1;
+            else if (spentBudget > (4/5) * budget_value) {
+                budget.replace(category, budget_value);
+                return 0;
+            }
+            else
+                budget.replace(category, budget_value);
+            return 1;
+        }
+        else
+        {
+            if (spentBudget > budget_value)
+                return -1;
+            else
+                budget.replace(category, budget_value);
+            return 1;
+        }
     }
 
     public void setExpense(int year, int month, int day, String category, double amount, String note) {
@@ -62,38 +81,25 @@ public class Expenses implements Iterable<Expense> {
         expenses.add(expense);
         addCategory(expense.category);
     }
-    public void setExpense(int year, int month, int day, String category, double amount) {
-        expenses.add(new Expense(LocalDate.of(year, month, day), category, amount, ""));
-        addCategory(category);
-    }
-    public void setExpense(LocalDate time, String category, double amount) {
-        expenses.add(new Expense(time, category, amount, ""));
-        addCategory(category);
-    }
-    public void setExpense(String category, double amount) {
-        expenses.add(new Expense(LocalDate.now(), category, amount, ""));
-        addCategory(category);
-    }
-    public void setExpense(String category, double amount, String note) {
-        expenses.add(new Expense(LocalDate.now(), category, amount, note));
+
+    public static boolean isValidCategory(String category)
+    {
+        if (category.trim().isEmpty())
+            return false;
+        else if (category.contains(" "))
+            return false;
+        return true;
     }
 
     private void addCategory(String category)
     {
-        if (category.trim().isEmpty())
-        {
-            if (categories.containsKey("Uncategorized"))
-                categories.replace("Uncategorized", categories.get("Uncategorized") + 1);
-            else {
-                categories.put("Uncategorized", 1);
-                budget.put("Uncategorized", -1.0);
-            }
-        }
+        if (!isValidCategory(category))
+            this.addCategory("Uncategorized");
         else if (categories.containsKey(category))
             categories.replace(category, categories.get(category) + 1);
         else {
             categories.put(category, 1);
-            budget.put(category, -1.0);
+            budget.put(category, Double.MAX_VALUE);
         }
     }
 

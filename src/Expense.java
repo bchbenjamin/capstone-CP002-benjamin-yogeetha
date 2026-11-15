@@ -1,7 +1,6 @@
 import java.time.LocalDate;
 
 public class Expense implements Comparable<Expense> {
-    boolean spent;
     LocalDate date;
     String category;
     double amount;
@@ -13,15 +12,21 @@ public class Expense implements Comparable<Expense> {
             return 0;
         else if (this.amount > o.amount)
             return 1;
-        else return -1;
+        else
+            return -1;
     }
+
     Expense(LocalDate date, String category, double amount, String note)
     {
-        this.date = date;
+        if (date.isAfter(LocalDate.now()))
+            this.date = LocalDate.now();
+        else
+            this.date = date;
         this.category = category;
         this.amount = amount;
         this.note = note;
     }
+
     @Override
     public String toString()
     {
@@ -31,3 +36,10 @@ public class Expense implements Comparable<Expense> {
             return date+"\t"+category+"\t"+amount+"\nNote: "+note+"\n";
     }
 }
+
+/**
+ * Date | Category | Amount | Note
+ * object
+ * Note: <Note></Note>
+ * object2
+ */
