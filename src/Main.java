@@ -26,8 +26,8 @@ public class Main {
                         String category = sc.next();
                         System.out.print("Enter Expense: ");
                         double expense = sc.nextDouble();
-                        sc.next();
                         System.out.print("Enter short note (Press enter to skip): ");
+                        sc.nextLine();
                         String note = sc.nextLine();
                         System.out.print("Enter Year: ");
                         int year = sc.nextInt();
