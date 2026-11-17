@@ -21,20 +21,21 @@ public class Main {
                     System.out.println("1. Today's Date");
                     System.out.println("2. Enter Custom Date");
                     if (sc.nextInt() == 2) {
-                        System.out.println("Current Categories: " + ex.categories());
-                        System.out.print("Enter Category: ");
-                        String category = sc.next();
-                        System.out.print("Enter Expense: ");
-                        double expense = sc.nextDouble();
-                        System.out.print("Enter short note (Press enter to skip): ");
-                        sc.nextLine();
-                        String note = sc.nextLine();
                         System.out.print("Enter Year: ");
                         int year = sc.nextInt();
                         System.out.print("Enter Month: ");
                         int month = sc.nextInt();
                         System.out.print("Enter Date: ");
                         int date = sc.nextInt();
+                        System.out.println("Current Categories: " + ex.categories());
+                        System.out.print("Enter Category: ");
+                        String category = sc.next();
+                        sc.nextLine();
+                        System.out.print("Enter Expense: ");
+                        double expense = sc.nextDouble();
+                        sc.nextLine();
+                        System.out.print("Enter short note (Press enter to skip): ");
+                        String note = sc.nextLine();
                         ex.setExpense(year, month, date, category, expense, note.trim());
                     }
                     else

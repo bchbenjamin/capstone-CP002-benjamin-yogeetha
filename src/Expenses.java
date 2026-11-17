@@ -1,7 +1,5 @@
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 public class Expenses implements Iterable<Expense> {
     private ArrayList<Expense> expenses = new ArrayList<>();
@@ -10,8 +8,22 @@ public class Expenses implements Iterable<Expense> {
 //    public double total = Double.MAX_VALUE;
     public boolean warn = true;
 
-    public void getSummary() {
-        System.out.println(this);
+    private String summaryLines(String category, double spent, double budget)
+        {return "\n"+category+"\t"+spent+"\t"+budget;}
+
+    public String getSummary()
+    {
+        Expenses e = getThisMonthExpenses();
+        HashMap<String, Double> categories = new HashMap<>();
+        for (Expense ex : e)
+            if (categories.containsKey(ex.category))
+                categories.replace(ex.category, categories.get(ex.category) + ex.amount);
+            else
+                categories.put(ex.category, ex.amount);
+        StringBuilder output = new StringBuilder("Category\tAmount Spent\t");
+        for (String s : categories.keySet())
+            {output.append(summaryLines(s, categories.get(s), this.budget.get(s)));}
+        return "" + output;
     }
 
     public Expenses getLargestExpenses(int n) {
@@ -50,7 +62,7 @@ public class Expenses implements Iterable<Expense> {
         {
             if (spentBudget > budget_value)
                 return -1;
-            else if (spentBudget > (4/5) * budget_value) {
+            else if (spentBudget > ((4/5) * budget_value)) {
                 budget.replace(category, budget_value);
                 return 0;
             }
@@ -105,6 +117,9 @@ public class Expenses implements Iterable<Expense> {
 
     public String categories()
         {return categories.toString();}
+
+    public Set<String> getCategories()
+        {return categories.keySet();}
 
     @Override
     public String toString()
